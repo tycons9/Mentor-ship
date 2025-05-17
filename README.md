@@ -1,6 +1,4 @@
-Sure, here’s a **professional `README.md` template** tailored for your project. Since your main project is currently the **SkillBridge** mentorship platform and you're using **Node.js, React, SQL, and PHP**, I’ve created a polished and complete version below. You can customize it further as needed.
 
----
 
 ## ✅ `README.md` for SkillBridge
 
@@ -77,7 +75,7 @@ skillbridge/
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/skillbridge.git
+git clone https://github.com/your-username/skillbridge.git](https://github.com/tycons9/Mentor-ship.git
 cd skillbridge
 
 # Install backend dependencies
