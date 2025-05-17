@@ -33,6 +33,7 @@ app.use('/api/users', userRoutes);
 
 
 app.listen(PORT, async () => {
-  await connectToDatabase();
+
   console.log(`🟢 Server running at http://localhost:${PORT}`);
+    await connectToDatabase();
 });
