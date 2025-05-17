@@ -7,11 +7,11 @@ const saltRounds = 10;
 
 
 export const registerUser = async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { username, email, password, role } = req.body;
 
-  if (!name || !email || !password || !role) {
+  if (!username || !email || !password || !role) {
     return res.status(400).json({
-      message: "All fields (name, email, password, role) are required."
+      message: "All fields (username, email, password, role) are required."
     });
   }
 
@@ -30,8 +30,8 @@ export const registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     await connection.execute(
-      'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
-      [name, email, hashedPassword, role]
+      'INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)',
+      [username, email, hashedPassword, role]
     );
 
     res.status(201).json({ message: 'User registered successfully' });
@@ -39,6 +39,7 @@ export const registerUser = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -62,10 +63,10 @@ export const loginUser = async (req, res) => {
       { expiresIn: '1d' }
     );
 
-    // Set token in HTTP-only cookie
+   
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'development', // only true in production
+      secure: process.env.NODE_ENV === 'development',
       sameSite: 'strict',
       maxAge: 24 * 60 * 60 * 1000, 
     });

@@ -6,33 +6,32 @@ import cors from 'cors';
 import { PORT } from './config/env.js';
 import { connectToDatabase } from './config/db.js';
 
-// Load environment variables
-config({ path: `.env.${process.env.NODE_ENV || 'development'}.local` });
 
-// Import routes
+config({ path: `.env.${process.env.NODE_ENV || 'development'}.local` });
 import authRoutes from './routes/auth.routes.js';
-import userRoutes from './routes/user.routes.js'; // <-- Add your user management routes
+import userRoutes from './routes/user.routes.js'; 
 
 const app = express();
 
-// Middleware
+
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: 'http://127.0.0.1:5500', 
   credentials: true
 }));
+
 app.use(express.json());
 app.use(cookieParser());
 
-// Test route
+
 app.get('/', (req, res) => {
   res.send('🚀 SkillBridge backend is running!');
 });
 
-// Routes
+
 app.use('/api/auth', authRoutes);    
 app.use('/api/users', userRoutes);    
 
-// Start server
+
 app.listen(PORT, async () => {
   await connectToDatabase();
   console.log(`🟢 Server running at http://localhost:${PORT}`);
