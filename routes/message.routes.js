@@ -1,22 +1,47 @@
-// routes/messageRoutes.js
 import express from 'express';
-import { sendMessage, getMessagesBetweenUsers } from '../models/message.model.js';
+import pool from '../config/db.js'; // Add this import
+import { 
+  sendMessage, 
+  getMessagesBetweenUsers, 
+  getConversationsForUser,
+  markMessagesAsRead
+} from '../models/message.model.js';
 
 const router = express.Router();
 
 // POST /api/messages
 router.post('/', async (req, res) => {
-  const { senderId, receiverId, message } = req.body;
+  const { sender_id, receiver_id, message } = req.body;
 
-  if (!senderId || !receiverId || !message) {
+  if (!sender_id || !receiver_id || !message) {
     return res.status(400).json({ error: 'All fields are required' });
   }
 
   try {
-    const messageId = await sendMessage(senderId, receiverId, message);
-    res.status(201).json({ message: 'Message sent', id: messageId });
+    const messageId = await sendMessage(sender_id, receiver_id, message);
+    
+    // Get the newly created message using the imported pool
+    const [newMessage] = await pool.query(
+      'SELECT * FROM messages WHERE id = ?',
+      [messageId]
+    );
+    
+    res.status(201).json(newMessage[0]);
   } catch (error) {
     console.error('Error sending message:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// GET /api/messages/conversations/:userId
+router.get('/conversations/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const conversations = await getConversationsForUser(userId);
+    res.json(conversations);
+  } catch (error) {
+    console.error('Error fetching conversations:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -30,6 +55,23 @@ router.get('/:userA/:userB', async (req, res) => {
     res.json(messages);
   } catch (error) {
     console.error('Error fetching messages:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// POST /api/messages/mark-as-read
+router.post('/mark-as-read', async (req, res) => {
+  const { messageIds } = req.body;
+
+  if (!messageIds || !Array.isArray(messageIds)) {
+    return res.status(400).json({ error: 'Invalid message IDs' });
+  }
+
+  try {
+    await markMessagesAsRead(messageIds);
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error('Error marking messages as read:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });

@@ -7,13 +7,18 @@ const saltRounds = 10;
 
 
 export const registerUser = async (req, res) => {
-  const { username, email, password, role } = req.body;
+  const { name, email, password, role } = req.body;
 
-  if (!username || !email || !password || !role) {
+  if (!name || !email || !password || !role) {
     return res.status(400).json({
-      message: "All fields (username, email, password, role) are required."
+      message: "All fields (name, email, password, role) are required."
     });
   }
+
+  
+if (req.body.role === "admin") {
+  return res.status(403).json({ message: "Admin creation is not allowed through this endpoint." });
+}
 
   try {
     const connection = await connectToDatabase();
@@ -30,8 +35,8 @@ export const registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     await connection.execute(
-      'INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)',
-      [username, email, hashedPassword, role]
+      'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
+      [name, email, hashedPassword, role]
     );
 
     res.status(201).json({ message: 'User registered successfully' });
@@ -39,6 +44,7 @@ export const registerUser = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
@@ -95,7 +101,7 @@ export const logoutUser = (req, res) => {
 
   res.status(200).json({ message: 'Logout successful' });
 };
-// ✅ Get all users
+
 export const getAllUsers = async (req, res) => {
   try {
     const connection = await connectToDatabase();
@@ -108,7 +114,7 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
-// ✅ Update user info
+
 export const updateUser = async (req, res) => {
   const { id } = req.params;
   const { name, email, password, role } = req.body;
@@ -116,13 +122,13 @@ export const updateUser = async (req, res) => {
   try {
     const connection = await connectToDatabase();
 
-    // Check if user exists
+    
     const [existing] = await connection.execute('SELECT * FROM users WHERE id = ?', [id]);
     if (existing.length === 0) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    let hashedPassword = existing[0].password; // Keep old password if not updating
+    let hashedPassword = existing[0].password; 
 
     if (password) {
       hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -139,7 +145,7 @@ export const updateUser = async (req, res) => {
   }
 };
 
-// ✅ Delete user
+
 export const deleteUser = async (req, res) => {
   const { id } = req.params;
 

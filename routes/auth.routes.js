@@ -1,4 +1,3 @@
-// routes/auth.routes.js
 import express from 'express';
 import {
   registerUser,
@@ -6,10 +5,14 @@ import {
   logoutUser
 } from '../controllers/auth.controllers.js';
 
+import authorize from '../middlewares/auth.middleware.js';
+
 const router = express.Router();
 
-router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.post('/logout', logoutUser);
+
+
+router.post('/register', registerUser);
 
 export default router;

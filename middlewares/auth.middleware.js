@@ -3,7 +3,7 @@ import db from "../config/db.js";
 import { JWT_SECRET } from "../config/env.js";
 
 const authorize = (roles = []) => {
-  // roles can be a single role string or an array of roles
+  
   if (typeof roles === "string") {
     roles = [roles];
   }
@@ -19,9 +19,9 @@ const authorize = (roles = []) => {
       const token = authHeader.split(" ")[1];
       const decoded = jwt.verify(token, JWT_SECRET);
 
-      // Fetch user info from DB to check role and existence
+     
      const [rows] = await db.execute(
-  "SELECT id, username, email, role FROM users WHERE id = ?",
+  "SELECT id, name, email, role FROM users WHERE id = ?",
   [decoded.id]
 );
 
@@ -31,12 +31,12 @@ const authorize = (roles = []) => {
         return res.status(401).json({ message: "Access denied. User not found." });
       }
 
-      // If roles array is specified, check if user's role is allowed
+     
       if (roles.length && !roles.includes(user.role)) {
         return res.status(403).json({ message: "Forbidden. You do not have access." });
       }
 
-      // Attach user info to request for later handlers
+      
       req.user = user;
       next();
 

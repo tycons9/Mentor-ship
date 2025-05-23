@@ -12,7 +12,7 @@ export const getUsers = async (req, res, next) => {
     }
 
     const [users] = await db.execute(
-      "SELECT id, username, email FROM users WHERE id != ?",
+      "SELECT id, name, email FROM users WHERE id != ?",
       [loggedInUserId]
     );
 
@@ -38,7 +38,7 @@ export const getUserById = async (req, res, next) => {
     const { id } = req.params;
 
     const [rows] = await db.execute(
-      "SELECT id, username, email FROM users WHERE id = ?",
+      "SELECT id, name, email FROM users WHERE id = ?",
       [id]
     );
 
@@ -62,18 +62,18 @@ export const getUserById = async (req, res, next) => {
 export const updateUser = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { username, email } = req.body;
+    const { name, email } = req.body;
 
-    if (!username || !email) {
+    if (!name || !email) {
       return res.status(400).json({
         success: false,
-        message: "Username and email are required",
+        message: "name and email are required",
       });
     }
 
     const [result] = await db.execute(
-      "UPDATE users SET username = ?, email = ? WHERE id = ?",
-      [username, email, id]
+      "UPDATE users SET name = ?, email = ? WHERE id = ?",
+      [name, email, id]
     );
 
     if (result.affectedRows === 0) {
